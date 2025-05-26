@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+`params` should be awaited before using its properties. as we are using next js 15+
