@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
+import ImageUpload from '@/components/ui/image-upload';
 
 export type ExperienceData = {
   id?: string;
@@ -18,6 +19,7 @@ export type ExperienceData = {
   description: string;
   skills: string[];
   order: number;
+  logoUrl?: string;
 };
 
 type ExperienceFormProps = {
@@ -35,6 +37,7 @@ const defaultExperience: ExperienceData = {
   description: '',
   skills: [],
   order: 0,
+  logoUrl: '',
 };
 
 export default function ExperienceForm({ initialData = defaultExperience, onSubmit, onCancel }: ExperienceFormProps) {
@@ -61,6 +64,10 @@ export default function ExperienceForm({ initialData = defaultExperience, onSubm
       ...formData,
       skills: formData.skills.filter(skill => skill !== skillToRemove)
     });
+  };
+  
+  const handleLogoChange = (url: string) => {
+    setFormData({ ...formData, logoUrl: url });
   };
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -95,6 +102,19 @@ export default function ExperienceForm({ initialData = defaultExperience, onSubm
               onChange={handleChange}
               required
             />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="companyLogo">Company Logo</Label>
+            <ImageUpload
+              value={formData.logoUrl || ''}
+              onChange={handleLogoChange}
+              className="w-full max-w-xs"
+              height="h-36"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Upload a company logo (recommended: square PNG with transparent background)
+            </p>
           </div>
           
           <div className="space-y-2">

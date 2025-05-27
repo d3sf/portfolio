@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
         hostname: '**',
       },
     ],
+    unoptimized: true, // This will use original URLs instead of Next.js optimization
   },
 };
 

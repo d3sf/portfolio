@@ -3,11 +3,13 @@ import prisma from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+  
   try {
     const education = await prisma.education.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
     
     if (!education) {
@@ -23,12 +25,14 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+  
   try {
     const data = await request.json();
     const education = await prisma.education.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...data,
         startDate: new Date(data.startDate),
@@ -44,11 +48,13 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+  
   try {
     await prisma.education.delete({
-      where: { id: params.id },
+      where: { id },
     });
     return NextResponse.json({ message: 'Education deleted successfully' });
   } catch (error) {

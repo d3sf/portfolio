@@ -7,7 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import Image from 'next/image';
+import ImageUpload from '@/components/ui/image-upload';
+import { Save, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { startProgress, doneProgress } from '@/lib/nprogress';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -33,11 +37,14 @@ export default function ProfilePage() {
   }, []);
 
   const fetchProfile = async () => {
+    startProgress();
+    
     try {
-      setLoading(true);
       const data = await profileApi.get();
       setProfile(data);
       setFormData(data);
+      setError(null);
+      doneProgress();
     } catch (err: unknown) {
       const error = err as { response?: { status: number } };
       if (error.response?.status === 404) {
@@ -46,6 +53,17 @@ export default function ProfilePage() {
       } else {
         setError('Failed to load profile data');
         console.error('Error fetching profile:', err);
+        
+        doneProgress();
+        toast.error(
+          <div className="flex">
+            <XCircle className="h-5 w-5 text-red-500 mr-2" />
+            <div>
+              <div className="font-medium">Error Loading Profile</div>
+              <div className="text-sm">Failed to load profile data. Please refresh the page.</div>
+            </div>
+          </div>
+        );
       }
     } finally {
       setLoading(false);
@@ -57,9 +75,15 @@ export default function ProfilePage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleAvatarChange = (url: string) => {
+    setFormData(prev => ({ ...prev, avatarUrl: url }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    
+    startProgress();
     
     try {
       if (profile?.id) {
@@ -70,16 +94,43 @@ export default function ProfilePage() {
         await profileApi.create(formData);
       }
       await fetchProfile();
-      alert('Profile saved successfully!');
+      
+      doneProgress();
+      toast.success(
+        <div className="flex">
+          <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+          <div>
+            <div className="font-medium">Profile Saved</div>
+            <div className="text-sm">Your profile information has been updated successfully.</div>
+          </div>
+        </div>
+      );
     } catch (err) {
       console.error('Error saving profile:', err);
       setError('Failed to save profile data');
+      
+      doneProgress();
+      toast.error(
+        <div className="flex">
+          <XCircle className="h-5 w-5 text-red-500 mr-2" />
+          <div>
+            <div className="font-medium">Error Saving Profile</div>
+            <div className="text-sm">Failed to save profile data. Please try again.</div>
+          </div>
+        </div>
+      );
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <div>Loading profile information...</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -159,24 +210,16 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="avatarUrl">Avatar URL</Label>
-              <Input
-                id="avatarUrl"
-                name="avatarUrl"
+              <Label htmlFor="avatarUrl">Profile Avatar</Label>
+              <ImageUpload
                 value={formData.avatarUrl || ''}
-                onChange={handleChange}
-                placeholder="https://example.com/avatar.jpg"
+                onChange={handleAvatarChange}
+                className="w-full max-w-xs"
+                height="h-40"
               />
-              {formData.avatarUrl && (
-                <div className="mt-2 relative w-20 h-20 rounded-full overflow-hidden border">
-                  <Image 
-                    src={formData.avatarUrl}
-                    alt="Avatar preview"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Upload a profile picture (recommended size: 400x400px)
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -251,9 +294,19 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="flex justify-end">
+        <div className="pt-4 flex justify-end">
           <Button type="submit" disabled={saving}>
-            {saving ? 'Saving...' : 'Save Profile'}
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save Profile
+              </>
+            )}
           </Button>
         </div>
       </form>

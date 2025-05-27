@@ -1,88 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { GeneralSkill, generalSkillsApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import ContentContainer from "@/components/layout/ContentContainer";
+import { SkillsProps } from "@/lib/types";
 
-const Skills = () => {
-  const [skills, setSkills] = useState<GeneralSkill[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const data = await generalSkillsApi.getAll();
-        setSkills(data);
-      } catch (err) {
-        setError('Failed to load skills');
-        console.error('Error fetching skills:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSkills();
-  }, []);
-
-  if (loading) return (
-    <section id="skills" className="py-20 bg-gray-50 dark:bg-midnight">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          Skills
-        </h2>
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-gray-500 dark:text-gray-400">Loading skills...</p>
-        </div>
-      </div>
-    </section>
-  );
-  
-  if (error) return (
-    <section id="skills" className="py-20 bg-gray-50 dark:bg-midnight">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          Skills
-        </h2>
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-red-500">{error}</p>
-        </div>
-      </div>
-    </section>
-  );
+const Skills = ({ skills = [] }: SkillsProps) => {
+  if (!skills || skills.length === 0) return null;
 
   return (
-    <section id="skills" className="py-20 bg-gray-50 dark:bg-midnight">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+    <section id="skills" className="py-12 bg-gray-50 dark:bg-midnight">
+      <div className="container mx-auto px-4 ">
+        <h2 className="text-xl font-bold text-center mb-8 text-gray-900 dark:text-white">
           Skills
         </h2>
         
-        <div className="max-w-4xl mx-auto">
-          {skills.length === 0 ? (
-            <div className="text-center">
-              <p className="text-gray-500 dark:text-gray-400">No skills found.</p>
-            </div>
-          ) : (
-            <div className="flex flex-wrap justify-center gap-3">
-              {skills.map((skill) => (
-                <span
-                  key={skill.id}
-                  className={cn(
-                    "px-3 py-1.5 text-sm rounded-md",
-                    "bg-black dark:bg-black",
-                    "text-white dark:text-white",
-                    "font-medium",
-                    "transition-all duration-300",
-                    "hover:scale-105 hover:shadow-lg"
-                  )}
-                >
-                  {skill.name}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+        <ContentContainer>
+          <div className="flex flex-wrap justify-center gap-3">
+            {skills.map((skill) => (
+              <span
+                key={skill.id}
+                className={cn(
+                  "px-3 py-1 text-sm rounded-full",
+                  "bg-gray-100 border dark:bg-zinc-800",
+                  "text-zinc-700 dark:text-zinc-300",
+                  "font-medium",
+                  "transition-all duration-300",
+                  "hover:shadow-lg"
+                )}
+              >
+                {skill.name}
+              </span>
+            ))}
+          </div>
+        </ContentContainer>
       </div>
     </section>
   );

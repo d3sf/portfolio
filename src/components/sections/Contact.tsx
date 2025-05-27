@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RainbowButton } from "@/components/ui/rainbowbutton";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Profile } from "@/lib/api";
+import ContentContainer from "@/components/layout/ContentContainer";
 
 interface ContactProps {
   profile?: Profile | null;
@@ -55,13 +56,13 @@ const Contact: React.FC<ContactProps> = ({ profile }) => {
   };
 
   return (
-    <section id="contact" className="py-20 bg-gray-50 dark:bg-midnight">
+    <section id="contact" className="py-12 bg-gray-50 dark:bg-midnight">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+        <h2 className="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
           Get In Touch
         </h2>
         
-        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <ContentContainer className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Information */}
           <div className="space-y-8">
             <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
@@ -181,7 +182,7 @@ const Contact: React.FC<ContactProps> = ({ profile }) => {
               )}
             </form>
           </div>
-        </div>
+        </ContentContainer>
       </div>
     </section>
   );

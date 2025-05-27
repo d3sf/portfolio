@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { deleteImageByUrl } from '@/lib/cloudinary-server';
 
 const prisma = new PrismaClient();
 
 // GET /api/projects/:id
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await params;
   
   try {
     const project = await prisma.project.findUnique({
@@ -38,13 +39,25 @@ export async function GET(
 // PUT /api/projects/:id
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await params;
   
   try {
     const body = await request.json();
     const { title, description, imageUrl, githubUrl, liveUrl, skills, featured, order } = body;
+
+    // Get the current project to check for image changes
+    const currentProject = await prisma.project.findUnique({
+      where: { id },
+    });
+
+    if (!currentProject) {
+      return NextResponse.json(
+        { error: 'Project not found' },
+        { status: 404 }
+      );
+    }
 
     // Handle skills - similar to POST logic
     const skillConnections = await Promise.all(
@@ -108,6 +121,19 @@ export async function PUT(
       },
     });
 
+    // If the image URL has changed, delete the old image from Cloudinary
+    if (currentProject.imageUrl && 
+        currentProject.imageUrl !== imageUrl && 
+        currentProject.imageUrl.includes('cloudinary.com')) {
+      try {
+        await deleteImageByUrl(currentProject.imageUrl);
+        console.log(`Successfully deleted old project image: ${currentProject.imageUrl}`);
+      } catch (error) {
+        console.error(`Failed to delete old project image ${currentProject.imageUrl}:`, error);
+        // Don't throw here - the project update was successful
+      }
+    }
+
     return NextResponse.json(project);
   } catch (error) {
     console.error('Error updating project:', error);
@@ -121,14 +147,59 @@ export async function PUT(
 // DELETE /api/projects/:id
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params;
+  const { id } = await params;
   
   try {
+    // First, fetch the project to get the image URLs
+    const project = await prisma.project.findUnique({
+      where: { id },
+      include: {
+        skills: true,
+      },
+    });
+
+    if (!project) {
+      return NextResponse.json(
+        { error: 'Project not found' },
+        { status: 404 }
+      );
+    }
+
+    // Collect all image URLs to delete
+    const imagesToDelete: string[] = [];
+    
+    // Add project image
+    if (project.imageUrl) {
+      imagesToDelete.push(project.imageUrl);
+    }
+    
+    // Add skill icons
+    project.skills.forEach(skill => {
+      if (skill.iconUrl) {
+        imagesToDelete.push(skill.iconUrl);
+      }
+    });
+
+    // Delete the project from database first
     await prisma.project.delete({
       where: { id },
     });
+
+    // Then delete images from Cloudinary (do this after DB deletion to avoid inconsistent state)
+    const deletePromises = imagesToDelete.map(async (imageUrl) => {
+      try {
+        await deleteImageByUrl(imageUrl);
+        console.log(`Successfully deleted image: ${imageUrl}`);
+      } catch (error) {
+        console.error(`Failed to delete image ${imageUrl}:`, error);
+        // Don't throw here - we want to continue deleting other images
+      }
+    });
+
+    // Wait for all image deletions to complete
+    await Promise.allSettled(deletePromises);
 
     return NextResponse.json({ success: true });
   } catch (error) {

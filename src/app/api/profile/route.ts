@@ -14,8 +14,9 @@ export async function GET() {
     }
 
     return NextResponse.json(profile);
-  } catch (error) {
-    return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });
+  } catch (err) {
+    console.error('Error fetching profile:', err);
+    return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
   }
 }
 
@@ -24,11 +25,12 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     const profile = await prisma.profile.create({
-      data,
+      data: data,
     });
     return NextResponse.json(profile);
-  } catch (error) {
-    return NextResponse.json({ error: 'Error creating profile' }, { status: 500 });
+  } catch (err) {
+    console.error('Error creating profile:', err);
+    return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 });
   }
 }
 
@@ -38,10 +40,11 @@ export async function PUT(request: Request) {
     const data = await request.json();
     const profile = await prisma.profile.update({
       where: { id: data.id },
-      data,
+      data: data,
     });
     return NextResponse.json(profile);
-  } catch (error) {
-    return NextResponse.json({ error: 'Error updating profile' }, { status: 500 });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
   }
 } 

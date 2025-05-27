@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import EducationForm, { EducationData } from '@/components/admin/EducationForm';
+import toast from 'react-hot-toast';
+import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { startProgress, doneProgress } from '@/lib/nprogress';
 
 export default function EducationPage() {
   const [educations, setEducations] = useState<EducationData[]>([]);
@@ -16,6 +19,8 @@ export default function EducationPage() {
   }, []);
 
   const fetchEducations = async () => {
+    startProgress();
+    
     try {
       const response = await fetch('/api/education');
       const data = await response.json();
@@ -29,13 +34,28 @@ export default function EducationPage() {
         console.error('Unexpected response format for education data:', data);
         setEducations([]);
       }
+      doneProgress();
     } catch (error) {
       console.error('Error fetching education data:', error);
       setEducations([]);
+      
+      doneProgress();
+      toast.error(
+        <div className="flex">
+          <XCircle className="h-5 w-5 text-red-500 mr-2" />
+          <div>
+            <div className="font-medium">Error Loading Education</div>
+            <div className="text-sm">Failed to load education entries. Please try refreshing.</div>
+          </div>
+        </div>
+      );
     }
   };
 
   const handleSubmit = async (data: EducationData) => {
+    const isEditing = !!data.id;
+    startProgress();
+    
     try {
       const url = data.id ? `/api/education/${data.id}` : '/api/education';
       const method = data.id ? 'PUT' : 'POST';
@@ -52,30 +72,129 @@ export default function EducationPage() {
         fetchEducations();
         setIsFormOpen(false);
         setEditingEducation(undefined);
+        
+        doneProgress();
+        toast.success(
+          <div className="flex">
+            <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+            <div>
+              <div className="font-medium">
+                {isEditing ? 'Education Updated' : 'Education Added'}
+              </div>
+              <div className="text-sm">
+                {isEditing 
+                  ? 'Education entry has been updated successfully.' 
+                  : 'New education entry has been added successfully.'
+                }
+              </div>
+            </div>
+          </div>
+        );
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error('Error saving education:', error);
+      
+      doneProgress();
+      toast.error(
+        <div className="flex">
+          <XCircle className="h-5 w-5 text-red-500 mr-2" />
+          <div>
+            <div className="font-medium">Error Saving Education</div>
+            <div className="text-sm">Failed to save education entry. Please try again.</div>
+          </div>
+        </div>
+      );
     }
   };
 
   const handleEdit = (education: EducationData) => {
-    setEditingEducation(education);
+    // Format dates for the form inputs
+    const formattedEducation = {
+      ...education,
+      startDate: education.startDate ? new Date(education.startDate).toISOString().split('T')[0] : '',
+      endDate: education.endDate ? new Date(education.endDate).toISOString().split('T')[0] : '',
+    };
+    setEditingEducation(formattedEducation);
     setIsFormOpen(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this education entry?')) {
-      try {
-        const response = await fetch(`/api/education/${id}`, {
-          method: 'DELETE',
-        });
-
-        if (response.ok) {
-          fetchEducations();
-        }
-      } catch (error) {
-        console.error('Error deleting education:', error);
+    // Show confirmation with toast
+    toast(
+      (t) => (
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center">
+            <AlertTriangle className="h-5 w-5 text-indigo-500 mr-2" />
+            <div className="font-medium">Delete Education Entry?</div>
+          </div>
+          <p className="text-sm text-gray-500">This action cannot be undone.</p>
+          <div className="flex space-x-2 pt-2">
+            <button
+              onClick={() => {
+                toast.dismiss(t.id);
+                confirmDelete(id);
+              }}
+              className="px-3 py-1 bg-pink-500 text-white text-sm rounded hover:bg-pink-600 transition-colors"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1 bg-gray-200 text-gray-800 text-sm rounded hover:bg-gray-300 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: Infinity,
+        style: {
+          borderLeft: '4px solid #6366f1',
+        },
       }
+    );
+  };
+  
+  const confirmDelete = async (id: string) => {
+    startProgress();
+    
+    try {
+      const response = await fetch(`/api/education/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        fetchEducations();
+        
+        doneProgress();
+        toast.success(
+          <div className="flex">
+            <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+            <div>
+              <div className="font-medium">Education Deleted</div>
+              <div className="text-sm">Education entry has been removed successfully.</div>
+            </div>
+          </div>
+        );
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error deleting education:', error);
+      
+      doneProgress();
+      toast.error(
+        <div className="flex">
+          <XCircle className="h-5 w-5 text-red-500 mr-2" />
+          <div>
+            <div className="font-medium">Error Deleting Education</div>
+            <div className="text-sm">Failed to delete education entry. Please try again.</div>
+          </div>
+        </div>
+      );
     }
   };
 

@@ -30,12 +30,28 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('Received project data:', body);
+    
     const { title, description, imageUrl, githubUrl, liveUrl, skills, featured, order } = body;
 
     // Validate required fields
     if (!title || !description || !imageUrl) {
+      console.log('Missing required fields:', { title: !!title, description: !!description, imageUrl: !!imageUrl });
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: title, description, and imageUrl are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate data types
+    if (typeof title !== 'string' || typeof description !== 'string' || typeof imageUrl !== 'string') {
+      console.log('Invalid data types:', { 
+        title: typeof title, 
+        description: typeof description, 
+        imageUrl: typeof imageUrl 
+      });
+      return NextResponse.json(
+        { error: 'Invalid data types: title, description, and imageUrl must be strings' },
         { status: 400 }
       );
     }
@@ -67,6 +83,17 @@ export async function POST(request: NextRequest) {
       })
     );
 
+    console.log('Creating project with data:', {
+      title,
+      description,
+      imageUrl,
+      githubUrl,
+      liveUrl,
+      featured: featured || false,
+      order: order || 0,
+      skillConnections
+    });
+
     // Create project with skills
     const project = await prisma.project.create({
       data: {
@@ -89,8 +116,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
     console.error('Error creating project:', error);
+    
+    // Check if it's a Prisma error
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create project' },
+      { error: 'Failed to create project', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

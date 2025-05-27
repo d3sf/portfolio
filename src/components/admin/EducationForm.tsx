@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
+import ImageUpload from '@/components/ui/image-upload';
 
 export type EducationData = {
   id?: string;
@@ -19,6 +20,7 @@ export type EducationData = {
   description: string;
   achievements: string[];
   order: number;
+  logoUrl?: string;
 };
 
 type EducationFormProps = {
@@ -37,6 +39,7 @@ const defaultEducation: EducationData = {
   description: '',
   achievements: [],
   order: 0,
+  logoUrl: '',
 };
 
 export default function EducationForm({ initialData = defaultEducation, onSubmit, onCancel }: EducationFormProps) {
@@ -65,6 +68,10 @@ export default function EducationForm({ initialData = defaultEducation, onSubmit
     });
   };
   
+  const handleLogoChange = (url: string) => {
+    setFormData({ ...formData, logoUrl: url });
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
@@ -86,6 +93,19 @@ export default function EducationForm({ initialData = defaultEducation, onSubmit
               onChange={handleChange}
               required
             />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="institutionLogo">Institution Logo</Label>
+            <ImageUpload
+              value={formData.logoUrl || ''}
+              onChange={handleLogoChange}
+              className="w-full max-w-xs"
+              height="h-36"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Upload an institution logo (recommended: square PNG with transparent background)
+            </p>
           </div>
           
           <div className="space-y-2">

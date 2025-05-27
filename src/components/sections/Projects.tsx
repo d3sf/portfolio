@@ -1,40 +1,20 @@
 "use client";
 
-import { useEffect, useState } from 'react';
 import ProjectCard from "./ProjectCard";
-import { Project, projectsApi } from '@/lib/api';
+import ContentContainer from "@/components/layout/ContentContainer";
+import { ProjectsProps } from "@/lib/types";
 
-const Projects = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const data = await projectsApi.getAll();
-        setProjects(data);
-      } catch (err) {
-        setError('Failed to load projects');
-        console.error('Error fetching projects:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-
-  if (loading) return <div>Loading projects...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+// Component now accepts projects as props
+const Projects = ({ projects = [] }: ProjectsProps) => {
+  if (!projects || projects.length === 0) return null; // Show nothing if no projects
 
   return (
-    <section id="projects" className="py-20 bg-gray-50 dark:bg-midnight">
+    <section id="projects" className="py-12 bg-gray-50 dark:bg-midnight">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          My Projects
+        <h2 className="text-xl font-bold text-center mb-8 text-gray-900 dark:text-white">
+          Projects
         </h2>
-        <div className="max-w-5xl mx-auto">
+        <ContentContainer>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {projects.map((project) => (
               <ProjectCard
@@ -48,7 +28,7 @@ const Projects = () => {
               />
             ))}
           </div>
-        </div>
+        </ContentContainer>
       </div>
     </section>
   );

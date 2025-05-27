@@ -1,156 +1,97 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from 'react';
+import ContentContainer from '@/components/layout/ContentContainer';
 import { ChevronRight, ChevronDown } from "lucide-react";
+import Image from "next/image";
+import { ExperienceProps } from '@/lib/types';
 
-interface ExperienceItem {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  startDate: string;
-  endDate?: string;
-  description: string;
-  skills: string[];
-  order: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-const Experience = () => {
-  const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const Experience = ({ experiences = [] }: ExperienceProps) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchExperiences = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetch('/api/experience');
-        const data = await res.json();
-        
-        if (Array.isArray(data)) {
-          // Sort by order field, then by startDate
-          const sortedData = [...data].sort((a, b) => {
-            if (a.order !== b.order) {
-              return a.order - b.order;
-            }
-            return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-          });
-          setExperiences(sortedData);
-        } else {
-          setError('Failed to fetch experiences');
-        }
-      } catch (err) {
-        setError('Error fetching experiences');
-        console.error('Error fetching experiences:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchExperiences();
-  }, []);
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+    });
+  };
 
   const toggleExpand = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  // Format date from ISO string to readable format
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
+  if (!experiences || experiences.length === 0) return null; // Show nothing if no experiences
 
   return (
-    <section id="experience" className="py-20 bg-gray-50 dark:bg-midnight">
+    <section id="experience" className="py-12 bg-gray-50 dark:bg-midnight">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          Work Experience
+        <h2 className="text-xl md:text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
+          Experience
         </h2>
         
-        <div className="max-w-4xl mx-auto">
-          {isLoading ? (
-            <div className="text-center py-10">
-              <p className="text-gray-500 dark:text-gray-400">Loading experiences...</p>
-            </div>
-          ) : error ? (
-            <div className="text-center py-10">
-              <p className="text-red-500">{error}</p>
-            </div>
-          ) : experiences.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-gray-500 dark:text-gray-400">No experiences found.</p>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {experiences.map((exp, index) => (
-                <div key={exp.id} className="group">
-                  {/* Header - Always visible */}
-                  <div 
-                    className="flex items-center gap-6 cursor-pointer"
-                    onClick={() => toggleExpand(index)}
-                  >
-                    {/* Company Logo - Fallback to first letter if no logo */}
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden bg-white dark:bg-gray-700 flex-shrink-0 flex items-center justify-center text-3xl font-bold text-gray-700 dark:text-gray-300">
-                      {exp.company.charAt(0).toUpperCase()}
+        <ContentContainer>
+          <div className="space-y-6">
+            {experiences.map((experience, index) => (
+              <div key={experience.id} className="group">
+                <div 
+                  onClick={() => toggleExpand(index)}
+                  className="flex items-center gap-4 cursor-pointer"
+                >
+                  {/* Company Logo */}
+                  {experience.logoUrl ? (
+                    <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full border border-gray-200 dark:border-gray-700 overflow-hidden flex-shrink-0">
+                      <Image 
+                        src={experience.logoUrl} 
+                        alt={`${experience.company} logo`} 
+                        fill
+                        className="object-cover"
+                      />
                     </div>
-
-                    {/* Company Info */}
-                    <div className="flex-grow">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                          {exp.company}
-                        </h3>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          {expandedIndex === index ? (
-                            <ChevronDown className="w-5 h-5 text-gray-500" />
-                          ) : (
-                            <ChevronRight className="w-5 h-5 text-gray-500" />
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-gray-900 dark:text-white text-sm">
-                        {exp.title}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {exp.location}
-                      </p>
-                    </div>
-
-                    {/* Duration */}
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}
-                    </span>
-                  </div>
-
-                  {/* Expandable Content */}
-                  {expandedIndex === index && (
-                    <div className="mt-4 ml-22 pl-22">
-                      <p className="mb-4 ml-16 text-gray-600 dark:text-gray-300">
-                        {exp.description}
-                      </p>
-                      
-                      {exp.skills.length > 0 && (
-                        <div className="flex flex-wrap gap-2 ml-16">
-                          {exp.skills.map((skill) => (
-                            <span
-                              key={skill}
-                              className="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full"
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                  ) : (
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 flex-shrink-0 border border-gray-200 dark:border-gray-700 text-lg md:text-xl font-bold">
+                      {experience.company.charAt(0)}
                     </div>
                   )}
+                  
+                  {/* Company Info */}
+                  <div className="flex-grow min-w-0 flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                        {experience.company}
+                      </h3>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        {expandedIndex === index ? (
+                          <ChevronDown className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
+                        )}
+                      </div>
+                    </div>
+                    
+                    <p className="text-gray-900 dark:text-white text-xs md:text-sm">
+                      {experience.title}
+                    </p>
+                  </div>
+
+                  {/* Duration */}
+                  <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap flex-shrink-0">
+                    {formatDate(experience.startDate)} - {experience.endDate ? formatDate(experience.endDate) : 'Present'}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+
+                {/* Expandable Content */}
+                {expandedIndex === index && (
+                  <div className="mt-4" style={{ marginLeft: 'calc(4rem + 1.5rem)' }}>
+                    <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                      {experience.description}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </ContentContainer>
       </div>
     </section>
   );

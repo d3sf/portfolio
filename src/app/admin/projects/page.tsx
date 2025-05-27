@@ -3,10 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, AlertTriangle } from 'lucide-react';
 import Image from 'next/image';
 import { Project, projectsApi } from '@/lib/api';
+import { startProgress, doneProgress } from '@/lib/nprogress';
+import toast from 'react-hot-toast';
 
 export default function ProjectsPage() {
   const router = useRouter();
@@ -19,12 +22,18 @@ export default function ProjectsPage() {
   }, []);
 
   const fetchProjects = async () => {
+    startProgress();
+    
     try {
       const data = await projectsApi.getAll();
       setProjects(data);
+      doneProgress();
     } catch (err) {
       setError('Failed to load projects');
       console.error('Error fetching projects:', err);
+      
+      doneProgress();
+      toast.error('Failed to load projects. Please try refreshing the page.');
     } finally {
       setLoading(false);
     }
@@ -33,12 +42,17 @@ export default function ProjectsPage() {
   const handleDeleteProject = async (id: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
     
+    startProgress();
+    
     try {
       await projectsApi.delete(id);
       setProjects(projects.filter(project => project.id !== id));
+      doneProgress();
+      toast.success('Project deleted successfully');
     } catch (err) {
       console.error('Error deleting project:', err);
-      alert('Failed to delete project');
+      doneProgress();
+      toast.error('Failed to delete project');
     }
   };
   
@@ -46,8 +60,42 @@ export default function ProjectsPage() {
     router.push(`/admin/projects/${id}/edit`);
   };
   
-  if (loading) return <div>Loading projects...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+  const handleToggleFeatured = async (id: string, featured: boolean) => {
+    startProgress();
+    
+    try {
+      const project = projects.find(p => p.id === id);
+      if (!project) return;
+      
+      const updatedProject = await projectsApi.update(id, {
+        ...project,
+        featured,
+        skills: project.skills.map(skill => skill.id)
+      });
+      
+      setProjects(projects.map(p => 
+        p.id === id ? updatedProject : p
+      ));
+      
+      doneProgress();
+      toast.success(`Project ${featured ? 'featured' : 'unfeatured'} successfully`);
+    } catch (err) {
+      console.error('Error updating project featured status:', err);
+      doneProgress();
+      toast.error('Failed to update featured status');
+    }
+  };
+  
+  if (error) return (
+    <div className="flex items-center justify-center py-8">
+      <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-4 rounded-md flex items-center">
+        <AlertTriangle className="h-5 w-5 mr-2" />
+        {error}
+      </div>
+    </div>
+  );
+  
+  if (loading) return null;
   
   return (
     <div className="space-y-6">
@@ -82,11 +130,16 @@ export default function ProjectsPage() {
                   No image
                 </div>
               )}
-              {project.featured && (
-                <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                  Featured
-                </div>
-              )}
+              <div 
+                className="absolute top-2 right-2 bg-slate-800/80 backdrop-blur-sm text-white text-xs px-3 py-2 rounded-md flex items-center gap-2 shadow-md"
+                title={project.featured ? "Featured project" : "Not featured"}
+              >
+                <Switch
+                  checked={project.featured}
+                  onCheckedChange={(checked) => handleToggleFeatured(project.id, checked)}
+                />
+                <span className="font-medium">Featured</span>
+              </div>
             </div>
             <CardHeader>
               <CardTitle>{project.title}</CardTitle>

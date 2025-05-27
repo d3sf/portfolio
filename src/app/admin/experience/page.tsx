@@ -59,7 +59,13 @@ export default function ExperiencePage() {
   };
 
   const handleEdit = (experience: ExperienceData) => {
-    setEditingExperience(experience);
+    // Format dates for the form inputs
+    const formattedExperience = {
+      ...experience,
+      startDate: experience.startDate ? new Date(experience.startDate).toISOString().split('T')[0] : '',
+      endDate: experience.endDate ? new Date(experience.endDate).toISOString().split('T')[0] : '',
+    };
+    setEditingExperience(formattedExperience);
     setIsFormOpen(true);
   };
 

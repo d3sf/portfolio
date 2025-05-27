@@ -24,14 +24,10 @@ const ProjectCard = ({
   githubUrl,
 }: ProjectCardProps) => {
   return (
-    <Card className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 dark:from-[#1E1F21] dark:to-[#1E1F21] border-0 shadow-lg h-full flex flex-col backdrop-blur-lg">
-      {/* Magic Border Effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
-      <div className="absolute inset-[1px] bg-gradient-to-b from-white to-gray-50 dark:from-[#1E1F21] dark:to-[#000000] rounded-lg backdrop-blur-lg" />
-      <CardContent className="relative flex-1">
-        {/* Project Logo */}
-        <div className="flex mb-4">
-          <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-blue-500/50">
+    <Card className="relative overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm h-full flex flex-col hover:shadow-md transition-shadow duration-200">
+      <CardContent className="relative flex-1 p-6">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
             <Image
               src={image}
               alt={`${title} logo`}
@@ -39,20 +35,22 @@ const ProjectCard = ({
               className="object-cover"
             />
           </div>
+          <div>
+            <h3 className="text-xl font-semibold text-black dark:text-white">
+              {title}
+            </h3>
+          </div>
         </div>
 
-        <h3 className="text-xl font-semibold text-black dark:text-white mb-2">
-          {title}
-        </h3>
-        <p className="text-black dark:text-gray-300 mb-4 line-clamp-3 h-[4.5rem]">
+        <p className="text-base text-black dark:text-gray-300 mb-4 line-clamp-3">
           {description}
         </p>
-        
-        <div className="flex flex-wrap gap-1.5 mb-2">
+
+        <div className="flex flex-wrap gap-2 mb-4">
           {technologies.map((tech) => (
             <span
               key={tech}
-              className="px-2 py-0.5 text-xs rounded-md border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-300 transition-colors duration-200 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black"
+              className="px-1.5 py-0.5 text-xs rounded-md border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-transparent"
             >
               {tech}
             </span>
@@ -60,27 +58,27 @@ const ProjectCard = ({
         </div>
       </CardContent>
 
-      <CardFooter className="relative px-6 py-3 grid grid-cols-2 gap-2 mt-auto">
+      <CardFooter className="relative px-6 py-4 flex gap-3">
         {githubUrl && (
           <Link href={githubUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="w-full gap-1.5 h-8 text-xs border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            <Button
+              variant="outline"
+              size="default"
+              className="w-full gap-2 h-9 text-sm"
             >
-              <Github className="h-3.5 w-3.5" />
+              <Github className="h-4 w-4" />
               Source
             </Button>
           </Link>
         )}
         {websiteUrl && (
           <Link href={websiteUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="w-full gap-1.5 h-8 text-xs border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            <Button
+              variant="outline"
+              size="default"
+              className="w-full gap-2 h-9 text-sm"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLink className="h-4 w-4" />
               Website
             </Button>
           </Link>
