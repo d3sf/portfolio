@@ -67,13 +67,13 @@ const Hero = ({
   const lastName = nameParts.slice(1).join(' ');
 
   return (
-    <section className="pt-32 md:pt-48 pb-10 bg-gray-50 dark:bg-midnight">
+    <section className="pt-24 md:pt-32 pb-10 bg-gray-50 dark:bg-midnight">
       <div className="container mx-auto px-4">
         <ContentContainer>
           <div className="flex flex-col-reverse md:flex-row gap-8 items-center justify-between">
             {/* Content */}
             <div className="w-full md:w-2/3 text-center md:text-left">
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 text-gray-900 dark:text-white text-left">
+              <h1 className="text-5xl md:text-7xl font-bold mb-5 text-gray-900 dark:text-white text-left">
                 <span className="text-4xl md:text-6xl">Hello, I&apos;m</span> <AnimatedGradientText text={firstName} className="text-5xl md:text-7xl" />
                 {lastName && (
                   <span className="block mt-0">
@@ -81,7 +81,7 @@ const Hero = ({
                   </span>
                 )}
               </h1>
-              <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl text-left">
+              <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-7 max-w-2xl text-left">
                 {description}
               </p>
               
