@@ -5,38 +5,63 @@ import { Project, GeneralSkill } from "@/lib/api";
 
 // Fetch all data server-side
 async function getData() {
-  // Fetch profile data
-  const profileRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/profile`, { cache: 'no-store' });
-  const profile = await profileRes.json();
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   
-  // Fetch experience data
-  const experienceRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/experience`, { cache: 'no-store' });
-  const experiences = await experienceRes.json() as ExperienceType[];
-  
-  // Fetch projects data
-  const projectsRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/projects`, { cache: 'no-store' });
-  const projects = await projectsRes.json() as Project[];
-  
-  // Fetch skills data
-  const skillsRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/general-skills`, { cache: 'no-store' });
-  const skills = await skillsRes.json() as GeneralSkill[];
-  
-  // Fetch education data
-  const educationRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/education`, { cache: 'no-store' });
-  const education = await educationRes.json() as EducationItem[];
-  
-  // Fetch quotes data
-  const quotesRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/quotes`, { cache: 'no-store' });
-  const quotes = await quotesRes.json() as Quote[];
-  
-  return {
-    profile,
-    experiences,
-    projects,
-    skills,
-    education,
-    quotes
-  };
+  try {
+    // Fetch all data in parallel
+    const [
+      profileRes,
+      experienceRes,
+      projectsRes,
+      skillsRes,
+      educationRes,
+      quotesRes
+    ] = await Promise.all([
+      fetch(`${baseUrl}/api/profile`, { next: { revalidate: 3600 } }), // Cache for 1 hour
+      fetch(`${baseUrl}/api/experience`, { next: { revalidate: 3600 } }),
+      fetch(`${baseUrl}/api/projects`, { next: { revalidate: 3600 } }),
+      fetch(`${baseUrl}/api/general-skills`, { next: { revalidate: 3600 } }),
+      fetch(`${baseUrl}/api/education`, { next: { revalidate: 3600 } }),
+      fetch(`${baseUrl}/api/quotes`, { next: { revalidate: 3600 } })
+    ]);
+
+    // Parse all responses in parallel
+    const [
+      profile,
+      experiences,
+      projects,
+      skills,
+      education,
+      quotes
+    ] = await Promise.all([
+      profileRes.json(),
+      experienceRes.json(),
+      projectsRes.json(),
+      skillsRes.json(),
+      educationRes.json(),
+      quotesRes.json()
+    ]);
+
+    return {
+      profile,
+      experiences: experiences as ExperienceType[],
+      projects: projects as Project[],
+      skills: skills as GeneralSkill[],
+      education: education as EducationItem[],
+      quotes: quotes as Quote[]
+    };
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    // Return empty data structure in case of error
+    return {
+      profile: null,
+      experiences: [],
+      projects: [],
+      skills: [],
+      education: [],
+      quotes: []
+    };
+  }
 }
 
 export default async function Home() {

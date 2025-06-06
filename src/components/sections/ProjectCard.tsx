@@ -28,12 +28,16 @@ const ProjectCard = ({
       <CardContent className="relative flex-1 p-6">
         <div className="flex items-center gap-4 mb-4">
           <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
-            <Image
-              src={image}
-              alt={`${title} logo`}
-              fill
-              className="object-cover"
-            />
+            {image ? (
+              <Image
+                src={image}
+                alt={`${title} logo`}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 dark:bg-gray-700" />
+            )}
           </div>
           <div>
             <h3 className="text-xl font-semibold text-black dark:text-white">
@@ -42,7 +46,7 @@ const ProjectCard = ({
           </div>
         </div>
 
-        <p className="text-base text-black dark:text-gray-300 mb-4 line-clamp-3">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
           {description}
         </p>
 

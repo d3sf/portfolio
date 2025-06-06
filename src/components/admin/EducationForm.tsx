@@ -167,13 +167,13 @@ export default function EducationForm({ initialData = defaultEducation, onSubmit
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Description (Optional)</Label>
             <Textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              required
+              placeholder="Add a description of your education experience..."
             />
           </div>
           

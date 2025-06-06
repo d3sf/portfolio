@@ -1,10 +1,18 @@
 import { RainbowButton } from "@/components/ui/rainbowbutton";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+
 import ContentContainer from "@/components/layout/ContentContainer";
 import { cn } from "@/lib/utils";
 import { SiLinkedin } from "react-icons/si";
+
+// Preload the gradient animation
+const gradientAnimation = {
+  backgroundImage: "linear-gradient(to right, #c471ed, #f64f59)",
+  backgroundSize: "100% auto",
+  display: "inline-block",
+  lineHeight: "1.2",
+};
 
 interface AnimatedGradientTextProps {
   text: string;
@@ -13,28 +21,12 @@ interface AnimatedGradientTextProps {
 
 const AnimatedGradientText = ({ text, className }: AnimatedGradientTextProps) => {
   return (
-    <motion.span
+    <span
       className={cn("inline-block bg-clip-text text-transparent py-1 leading-tight", className)}
-      animate={{
-        backgroundImage: [
-          "linear-gradient(to right, #c471ed, #f64f59, #c471ed)", // Purple, Red, Purple
-          "linear-gradient(to right, #f64f59, #c471ed, #f64f59)", // Red, Purple, Red
-        ],
-      }}
-      transition={{
-        duration: 2,
-        repeat: Infinity,
-        repeatType: "reverse",
-        ease: "linear",
-      }}
-      style={{
-        backgroundSize: "300% auto",
-        display: "inline-block",
-        lineHeight: "1.2",
-      }}
+      style={gradientAnimation}
     >
       {text}
-    </motion.span>
+    </span>
   );
 };
 
@@ -61,7 +53,6 @@ const Hero = ({
   avatarUrl,
   linkedinUrl,
 }: HeroProps) => {
-  // Split the name into parts (assuming space-separated names)
   const nameParts = name.split(' ');
   const firstName = nameParts[0];
   const lastName = nameParts.slice(1).join(' ');
@@ -71,10 +62,11 @@ const Hero = ({
       <div className="container mx-auto px-4">
         <ContentContainer>
           <div className="flex flex-col-reverse md:flex-row gap-8 items-center justify-between">
-            {/* Content */}
+            {/* Content - Prioritize text content */}
             <div className="w-full md:w-2/3 text-center md:text-left">
               <h1 className="text-5xl md:text-7xl font-bold mb-5 text-gray-900 dark:text-white text-left">
-                <span className="text-4xl md:text-6xl">Hello, I&apos;m</span> <AnimatedGradientText text={firstName} className="text-5xl md:text-7xl" />
+                <span className="text-4xl md:text-6xl">Hello, I&apos;m</span>{" "}
+                <AnimatedGradientText text={firstName} className="text-5xl md:text-7xl" />
                 {lastName && (
                   <span className="block mt-0">
                     <AnimatedGradientText text={lastName} className="text-5xl md:text-7xl" />
@@ -142,7 +134,7 @@ const Hero = ({
               )}
             </div>
             
-            {/* Avatar */}
+            {/* Avatar - Load with lower priority */}
             {avatarUrl && (
               <div className="flex-shrink-0 w-full md:w-1/3 flex justify-center md:justify-end mb-8 md:mb-0">
                 <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden shadow-lg">
@@ -151,7 +143,9 @@ const Hero = ({
                     alt={name}
                     fill
                     className="object-cover"
-                    priority
+                    loading="eager"
+                    sizes="(max-width: 768px) 192px, 224px"
+                    quality={90}
                   />
                 </div>
               </div>
