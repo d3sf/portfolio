@@ -67,7 +67,7 @@ model Experience {
   location    String
   startDate   DateTime
   endDate     DateTime?
-  description String
+  description String?
   skills      String[]
   order       Int      @default(0)
   logoUrl     String?
@@ -120,7 +120,7 @@ model SiteSettings {
   title           String
   description     String
   keywords        String
-  darkModeDefault Boolean  @default(false)
+  darkModeDefault Boolean  @default(true)
   animationsEnabled Boolean @default(true)
   updatedAt       DateTime @updatedAt
 }

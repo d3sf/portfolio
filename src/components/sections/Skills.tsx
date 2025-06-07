@@ -20,9 +20,9 @@ const Skills = ({ skills = [] }: SkillsProps) => {
               <span
                 key={skill.id}
                 className={cn(
-                  "px-3 py-1 text-sm rounded-full",
-                  "bg-gray-100 border dark:bg-zinc-800",
-                  "text-zinc-700 dark:text-zinc-300",
+                  "px-3 py-1 text-sm rounded-md",
+                  "bg-zinc-800 border dark:bg-gray-100",
+                  "text-zinc-300 dark:text-zinc-700",
                   "font-medium",
                   "transition-all duration-300",
                   "hover:shadow-lg"

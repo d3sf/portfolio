@@ -34,7 +34,7 @@ function ContentWithLoading({ children }: { children: React.ReactNode }) {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'white',
+            backgroundColor: 'var(--midnight)',
             zIndex: 9999
           }}
           className="dark:bg-midnight"
@@ -61,7 +61,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
     return (
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
+        defaultTheme="dark"
         enableSystem
         storageKey="portfolio-admin-theme"
       >
@@ -83,7 +83,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="dark"
       enableSystem
       storageKey="portfolio-public-theme"
     >

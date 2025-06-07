@@ -6,12 +6,11 @@ import Education from "@/components/sections/Education";
 import Skills from "@/components/sections/Skills";
 import Hero from "@/components/sections/Hero";
 import Quotes from "@/components/sections/Quotes";
-import { Experience as ExperienceType, EducationItem, Quote } from "@/lib/types";
+import { EducationItem, Quote } from "@/lib/types";
 import { Project, GeneralSkill, Profile } from "@/lib/api";
 
 interface HomeClientProps {
   profile: Profile | null;
-  experiences: ExperienceType[];
   projects: Project[];
   skills: GeneralSkill[];
   education: EducationItem[];
@@ -20,7 +19,6 @@ interface HomeClientProps {
 
 export default function HomeClient({
   profile,
-  experiences,
   projects,
   skills,
   education,
@@ -50,7 +48,7 @@ export default function HomeClient({
       {/* All sections with pre-fetched data */}
       <Skills skills={skills} />
       <Projects projects={projects} />
-      <Experience experiences={experiences} />
+      <Experience />
       <Education education={education} />
       <Quotes quotes={quotes} />
     </div>

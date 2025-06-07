@@ -1,13 +1,28 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ContentContainer from '@/components/layout/ContentContainer';
 import { ChevronRight, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { ExperienceProps } from '@/lib/types';
 
-const Experience = ({ experiences = [] }: ExperienceProps) => {
+const Experience = () => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [experiences, setExperiences] = useState<ExperienceProps['experiences']>([]);
+
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        const response = await fetch('/api/experience');
+        const data = await response.json();
+        setExperiences(data);
+      } catch (error) {
+        console.error('Error fetching experiences:', error);
+      }
+    };
+
+    fetchExperiences();
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -21,7 +36,7 @@ const Experience = ({ experiences = [] }: ExperienceProps) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  if (!experiences || experiences.length === 0) return null; // Show nothing if no experiences
+  if (!experiences || experiences.length === 0) return null;
 
   return (
     <section id="experience" className="py-12 bg-gray-50 dark:bg-midnight">
@@ -35,8 +50,8 @@ const Experience = ({ experiences = [] }: ExperienceProps) => {
             {experiences.map((experience, index) => (
               <div key={experience.id} className="group">
                 <div 
-                  onClick={() => toggleExpand(index)}
-                  className="flex items-center gap-4 cursor-pointer"
+                  onClick={() => experience.description && toggleExpand(index)}
+                  className={`flex items-center gap-4 ${experience.description ? 'cursor-pointer' : ''}`}
                 >
                   {/* Company Logo */}
                   {experience.logoUrl ? (
@@ -60,13 +75,15 @@ const Experience = ({ experiences = [] }: ExperienceProps) => {
                       <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white whitespace-nowrap">
                         {experience.company}
                       </h3>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                        {expandedIndex === index ? (
-                          <ChevronDown className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
-                        )}
-                      </div>
+                      {experience.description && (
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                          {expandedIndex === index ? (
+                            <ChevronDown className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-500 dark:text-gray-400" />
+                          )}
+                        </div>
+                      )}
                     </div>
                     
                     <p className="text-gray-900 dark:text-white text-xs md:text-sm">
@@ -81,7 +98,7 @@ const Experience = ({ experiences = [] }: ExperienceProps) => {
                 </div>
 
                 {/* Expandable Content */}
-                {expandedIndex === index && (
+                {expandedIndex === index && experience.description && (
                   <div className="mt-4" style={{ marginLeft: 'calc(4rem + 1.5rem)' }}>
                     <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 whitespace-pre-line">
                       {experience.description}
