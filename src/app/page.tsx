@@ -16,11 +16,11 @@ async function getData() {
       educationRes,
       quotesRes
     ] = await Promise.all([
-      fetch(`${baseUrl}/api/profile`),
-      fetch(`${baseUrl}/api/projects`),
-      fetch(`${baseUrl}/api/general-skills`),
-      fetch(`${baseUrl}/api/education`),
-      fetch(`${baseUrl}/api/quotes`)
+      fetch(`${baseUrl}/api/profile`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/projects`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/general-skills`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/education`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/quotes`, { cache: 'no-store' })
     ]);
 
     // Parse all responses in parallel
