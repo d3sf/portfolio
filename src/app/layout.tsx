@@ -5,6 +5,7 @@ import ClientLayout from "@/components/layout/ClientLayout";
 import { Toaster } from 'sonner';
 import AuthProvider from "@/components/providers/AuthProvider";
 import prisma from "@/lib/prisma";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +67,7 @@ export default async function RootLayout({
           <ClientLayout>
             {children}
           </ClientLayout>
+          <Analytics />
         </AuthProvider>
       </body>
     </html>
