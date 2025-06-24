@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import ImageUpload from '@/components/ui/image-upload';
 import { Save, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -30,6 +31,7 @@ export default function ProfilePage() {
     twitterUrl: '',
     resumeUrl: '',
     calLink: '',
+    showAvatar: true,
   });
 
   useEffect(() => {
@@ -77,6 +79,10 @@ export default function ProfilePage() {
 
   const handleAvatarChange = (url: string) => {
     setFormData(prev => ({ ...prev, avatarUrl: url }));
+  };
+
+  const handleShowAvatarChange = (checked: boolean) => {
+    setFormData(prev => ({ ...prev, showAvatar: checked }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -210,7 +216,17 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="avatarUrl">Profile Avatar</Label>
+              <div className="flex justify-between items-center mb-2">
+                <Label htmlFor="avatarUrl">Profile Avatar</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="showAvatar" className="text-sm text-gray-500">Show on website</Label>
+                  <Switch
+                    id="showAvatar"
+                    checked={formData.showAvatar}
+                    onCheckedChange={handleShowAvatarChange}
+                  />
+                </div>
+              </div>
               <ImageUpload
                 value={formData.avatarUrl || ''}
                 onChange={handleAvatarChange}

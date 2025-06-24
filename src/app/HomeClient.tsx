@@ -14,7 +14,7 @@ interface HomeClientProps {
   projects: Project[];
   skills: GeneralSkill[];
   education: EducationItem[];
-  quotes: Quote[];
+  randomQuote: Quote | null;
 }
 
 export default function HomeClient({
@@ -22,7 +22,7 @@ export default function HomeClient({
   projects,
   skills,
   education,
-  quotes
+  randomQuote
 }: HomeClientProps) {
   return (
     <div className="min-h-screen">
@@ -35,6 +35,7 @@ export default function HomeClient({
           calLink={profile.calLink}
           avatarUrl={profile.avatarUrl}
           linkedinUrl={profile.linkedinUrl}
+          showAvatar={profile.showAvatar}
         />
       ) : (
         <Hero
@@ -46,11 +47,11 @@ export default function HomeClient({
       )}
       
       {/* All sections with pre-fetched data */}
-      <Skills skills={skills} />
-      <Projects projects={projects} />
       <Experience />
       <Education education={education} />
-      <Quotes quotes={quotes} />
+      <Projects projects={projects} />
+      <Skills skills={skills} />
+      {randomQuote && <Quotes quotes={[randomQuote]} />}
     </div>
   );
 } 

@@ -38,12 +38,15 @@ async function getData() {
       quotesRes.json()
     ]);
 
+    // Select a random quote on the server side
+    const randomQuote = quotes.length > 0 ? quotes[Math.floor(Math.random() * quotes.length)] : null;
+
     return {
       profile,
       projects: projects as Project[],
       skills: skills as GeneralSkill[],
       education: education as EducationItem[],
-      quotes: quotes as Quote[]
+      randomQuote: randomQuote as Quote
     };
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -53,7 +56,7 @@ async function getData() {
       projects: [],
       skills: [],
       education: [],
-      quotes: []
+      randomQuote: null
     };
   }
 }
@@ -74,7 +77,7 @@ export default async function Home() {
       projects={sortedProjects}
       skills={data.skills}
       education={data.education}
-      quotes={data.quotes}
+      randomQuote={data.randomQuote}
     />
   );
 }

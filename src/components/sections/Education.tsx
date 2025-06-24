@@ -14,7 +14,7 @@ const Education = ({ education = [] }: EducationProps) => {
   return (
     <section id="education" className="py-12 bg-gray-50 dark:bg-midnight">
       <div className="container mx-auto px-4">
-        <h2 className="text-xl md:text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
+        <h2 className="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
           Education
         </h2>
         

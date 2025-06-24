@@ -71,6 +71,7 @@ export interface Profile {
   twitterUrl?: string;
   resumeUrl?: string;
   calLink?: string;
+  showAvatar: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -87,6 +88,7 @@ export interface ProfileInput {
   twitterUrl?: string;
   resumeUrl?: string;
   calLink?: string;
+  showAvatar?: boolean;
 }
 
 // Projects API

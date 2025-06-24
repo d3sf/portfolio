@@ -1,21 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import ContentContainer from "@/components/layout/ContentContainer";
 import { RiDoubleQuotesR } from "react-icons/ri";
 import { QuotesProps } from "@/lib/types";
 
 export default function Quotes({ quotes = [] }: QuotesProps) {
-  // If we have quotes, pick a random one to display
-  const [quote] = useState(() => {
-    if (!quotes || quotes.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    return quotes[randomIndex];
-  });
-
-  if (!quote) {
+  if (!quotes || quotes.length === 0) {
     return null;
   }
+
+  // Use the pre-selected quote (will be the only one in the array)
+  const quote = quotes[0];
 
   return (
     <section id="quotes" className="py-12 bg-gray-50 dark:bg-midnight">

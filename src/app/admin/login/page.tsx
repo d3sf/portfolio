@@ -38,6 +38,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="max-w-md w-full p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <h2 className="text-lg text-center text-gray-600 dark:text-gray-400 mb-2">
+          Personal Portfolio
+        </h2>
         <h1 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
           Admin Login
         </h1>

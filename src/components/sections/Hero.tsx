@@ -40,6 +40,7 @@ interface HeroProps {
   calLink?: string;
   avatarUrl?: string;
   linkedinUrl?: string;
+  showAvatar?: boolean;
 }
 
 const Hero = ({
@@ -52,6 +53,7 @@ const Hero = ({
   calLink,
   avatarUrl,
   linkedinUrl,
+  showAvatar = true,
 }: HeroProps) => {
   const nameParts = name.split(' ');
   const firstName = nameParts[0];
@@ -61,23 +63,21 @@ const Hero = ({
     <section className="pt-24 md:pt-32 pb-10 bg-gray-50 dark:bg-midnight">
       <div className="container mx-auto px-4">
         <ContentContainer>
-          <div className="flex flex-col-reverse md:flex-row gap-8 items-center justify-between">
+          <div className={`flex flex-row gap-4 md:gap-8 items-center ${avatarUrl && showAvatar ? 'sm:justify-between' : 'justify-center'}`}>
             {/* Content - Prioritize text content */}
-            <div className="w-full md:w-2/3 text-center md:text-left">
-              <h1 className="text-5xl md:text-7xl font-bold mb-5 text-gray-900 dark:text-white text-left">
-                <span className="text-4xl md:text-6xl">Hello, I&apos;m</span>{" "}
-                <AnimatedGradientText text={firstName} className="text-5xl md:text-7xl" />
+            <div className={`w-full ${avatarUrl && showAvatar ? 'sm:w-2/3' : 'w-full'} text-left`}>
+              <h1 className="flex flex-wrap text-5xl sm:text-5xl md:text-7xl font-bold mb-5 text-gray-900 dark:text-white items-baseline gap-2 md:gap-3">
+                <span className="text-4xl sm:text-4xl md:text-6xl whitespace-nowrap">Hello, I&apos;m</span>
+                <AnimatedGradientText text={firstName} className="text-5xl sm:text-5xl md:text-7xl whitespace-nowrap" />
                 {lastName && (
-                  <span className="block mt-0">
-                    <AnimatedGradientText text={lastName} className="text-5xl md:text-7xl" />
-                  </span>
+                  <AnimatedGradientText text={lastName} className="text-5xl sm:text-5xl md:text-7xl whitespace-nowrap" />
                 )}
               </h1>
-              <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 mb-7 max-w-2xl text-left">
+              <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 mb-7 max-w-2xl">
                 {description}
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start w-full">
+              <div className="flex flex-col sm:flex-row gap-4 justify-start w-full">
                 {calLink ? (
                   <Link href={calLink} target="_blank" rel="noopener noreferrer" className="w-full">
                     <RainbowButton
@@ -135,16 +135,16 @@ const Hero = ({
             </div>
             
             {/* Avatar - Load with lower priority */}
-            {avatarUrl && (
-              <div className="flex-shrink-0 w-full md:w-1/3 flex justify-center md:justify-end mb-8 md:mb-0">
-                <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden shadow-lg">
+            {avatarUrl && showAvatar && (
+              <div className="hidden sm:flex flex-shrink-0 w-1/3 justify-end">
+                <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden shadow-lg">
                   <Image 
                     src={avatarUrl} 
                     alt={name}
                     fill
                     className="object-cover"
                     loading="eager"
-                    sizes="(max-width: 768px) 192px, 224px"
+                    sizes="(max-width: 768px) 160px, 224px"
                     quality={90}
                   />
                 </div>
