@@ -32,6 +32,12 @@ export async function PUT(
   
   try {
     const data = await request.json();
+
+    // Convert order to number if it's a string
+    if (typeof data.order === 'string') {
+      data.order = parseInt(data.order, 10);
+    }
+    
     const experience = await prisma.experience.update({
       where: { id },
       data: {

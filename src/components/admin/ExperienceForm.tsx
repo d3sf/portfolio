@@ -46,7 +46,14 @@ export default function ExperienceForm({ initialData = defaultExperience, onSubm
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    
+    // Handle number fields
+    if (name === 'order') {
+      const numValue = value === '' ? 0 : parseInt(value, 10);
+      setFormData({ ...formData, [name]: numValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
   
   const handleAddSkill = () => {

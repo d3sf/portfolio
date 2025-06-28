@@ -387,7 +387,7 @@ export default function SkillsPage() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {skills.map((skill) => (
-                  <tr key={skill.id} className="hover:bg-gray-50 dark:hover:bg-gray-750">
+                  <tr key={skill.id} className="hover:bg-gray-100 dark:hover:bg-gray-700/50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <span className="font-medium">{skill.name}</span>
