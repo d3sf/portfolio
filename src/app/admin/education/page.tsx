@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import EducationForm, { EducationData } from '@/components/admin/EducationForm';
-import toast from 'react-hot-toast';
-import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { startProgress, doneProgress } from '@/lib/nprogress';
 
 export default function EducationPage() {
@@ -121,80 +121,26 @@ export default function EducationPage() {
   };
 
   const handleDelete = async (id: string) => {
-    // Show confirmation with toast
-    toast(
-      (t) => (
-        <div className="flex flex-col space-y-2">
-          <div className="flex items-center">
-            <AlertTriangle className="h-5 w-5 text-indigo-500 mr-2" />
-            <div className="font-medium">Delete Education Entry?</div>
-          </div>
-          <p className="text-sm text-gray-500">This action cannot be undone.</p>
-          <div className="flex space-x-2 pt-2">
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                confirmDelete(id);
-              }}
-              className="px-3 py-1 bg-pink-500 text-white text-sm rounded hover:bg-pink-600 transition-colors"
-            >
-              Delete
-            </button>
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1 bg-gray-200 text-gray-800 text-sm rounded hover:bg-gray-300 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      ),
-      {
-        duration: Infinity,
-        style: {
-          borderLeft: '4px solid #6366f1',
-        },
-      }
-    );
-  };
-  
-  const confirmDelete = async (id: string) => {
-    startProgress();
-    
-    try {
-      const response = await fetch(`/api/education/${id}`, {
-        method: 'DELETE',
-      });
+    // Use simple confirm dialog like in experience section
+    if (confirm('Are you sure you want to delete this education entry?')) {
+      startProgress();
+      try {
+        const response = await fetch(`/api/education/${id}`, {
+          method: 'DELETE',
+        });
 
-      if (response.ok) {
-        fetchEducations();
-        
+        if (response.ok) {
+          fetchEducations();
+          doneProgress();
+          toast.success('Education entry deleted successfully');
+        } else {
+          throw new Error('Failed to delete education entry');
+        }
+      } catch (error) {
+        console.error('Error deleting education:', error);
         doneProgress();
-        toast.success(
-          <div className="flex">
-            <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-            <div>
-              <div className="font-medium">Education Deleted</div>
-              <div className="text-sm">Education entry has been removed successfully.</div>
-            </div>
-          </div>
-        );
-      } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        toast.error('Failed to delete education entry');
       }
-    } catch (error) {
-      console.error('Error deleting education:', error);
-      
-      doneProgress();
-      toast.error(
-        <div className="flex">
-          <XCircle className="h-5 w-5 text-red-500 mr-2" />
-          <div>
-            <div className="font-medium">Error Deleting Education</div>
-            <div className="text-sm">Failed to delete education entry. Please try again.</div>
-          </div>
-        </div>
-      );
     }
   };
 
